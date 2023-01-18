@@ -102,6 +102,15 @@ public class ArmSubsystem extends SubsystemBase {
     armPistonRight.set(false);
   }
 
+  // arm piston toggle
+  public void ArmToggle() {
+    if(!armPistonLeft.get()) {
+      ArmExtend();
+    } else {
+      ArmRetract();
+    }
+  }
+
   // grabber retraction
   public void GrabberClose() {
     grabberPistonLeft.set(true);
@@ -112,6 +121,15 @@ public class ArmSubsystem extends SubsystemBase {
   public void GrabberOpen() {
     grabberPistonLeft.set(false);
     grabberPistonRight.set(false);
+  }
+
+  // grabber claw position toggle
+  public void GrabberToggle() {
+    if(!grabberPistonLeft.get()) {
+      GrabberClose();
+    } else {
+      GrabberOpen();
+    }
   }
 
   // grabber latch lift
@@ -125,6 +143,15 @@ public class ArmSubsystem extends SubsystemBase {
   public void GrabberShut() {
     if(getItemDIO()) {
       grabberPistonLatch.set(false);
+    }
+  }
+
+    // grabber claw position toggle
+  public void GrabberLatchToggle() {
+    if(!grabberPistonLatch.get()) {
+      GrabberLift();
+    } else {
+      GrabberShut();
     }
   }
 
@@ -146,6 +173,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  //arm position to conveyor
   public void ArmPosConveyor() {
     ArmRetract();
     GrabberOpen();
@@ -158,6 +186,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  //arm position to HP
   public void ArmPosHumanPlayer() {
     ArmRetract();
     GrabberOpen();
@@ -171,6 +200,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  //arm position to Node1
   public void ArmPosNode1() {
     ArmExtend();
     if(Math.abs(armEncoderLeft.getPosition() - posNode1 + nodeVar) > 50) {
@@ -182,6 +212,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  //arm position to Node2
   public void ArmPosNode2() {
     ArmExtend();
     if(Math.abs(armEncoderLeft.getPosition() - posNode2 + nodeVar) > 50) {
@@ -193,6 +224,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
   }
 
+  //arm position to Node3
   public void ArmPosNode3() {
     ArmExtend();
     if(Math.abs(armEncoderLeft.getPosition() - posNode3 + nodeVar) > 50) {
