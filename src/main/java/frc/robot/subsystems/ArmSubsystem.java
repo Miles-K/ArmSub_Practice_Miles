@@ -8,17 +8,15 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.CounterBase.EncodingType;
 import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
 public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ArmSubsystem. */
-  private ArmSubsystem armSubsystem;
 
   // arm extension pistons
   private Solenoid armPistonLeft;
@@ -40,6 +38,8 @@ public class ArmSubsystem extends SubsystemBase {
   // arm motors motor cotroller group
   private MotorControllerGroup armMotorGroup;
 
+  private DigitalInput itemSensor;
+
   // arm position presets
   private double posFloor = 0;
   private double posConveyor = 0;
@@ -48,9 +48,13 @@ public class ArmSubsystem extends SubsystemBase {
   private double posNode2 = 0;
   private double posNode3 = 0;
 
-  public ArmSubsystem(ArmSubsystem armSubsystem) {
+  // adjustment # between cone nodes and cube nodes
+  private double nodeVar;
+
+  public ArmSubsystem() {
 
     // initialization
+    // arm & grabber
     armPistonLeft = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.ARM_PISTON_LEFT);
     armPistonRight = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.ARM_PISTON_RIGHT);
 
@@ -67,12 +71,23 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorGroup = new MotorControllerGroup(armMotorLeft, armMotorRight);
     armMotorRight.follow(armMotorLeft, true);
 
-    this.armSubsystem = armSubsystem;
+    // sensor
+    itemSensor = new DigitalInput(Constants.DIO.ITEM_SENSOR);
   }
 
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
+  }
+
+  // arm run at low speed
+  public void ArmRun() {
+    armMotorGroup.set(0.1);
+  }
+
+  // arm stop
+  public void ArmStop() {
+    armMotorGroup.set(0.);
   }
 
   // arm extension
@@ -101,12 +116,16 @@ public class ArmSubsystem extends SubsystemBase {
 
   // grabber latch lift
   public void GrabberLift() {
-    grabberPistonLatch.set(true);
+    if(!getItemDIO()) {
+      grabberPistonLatch.set(true);
+    }
   }
 
   // grabber latch shut
   public void GrabberShut() {
-    grabberPistonLatch.set(false);
+    if(getItemDIO()) {
+      grabberPistonLatch.set(false);
+    }
   }
 
   // arm joystick input
@@ -116,12 +135,85 @@ public class ArmSubsystem extends SubsystemBase {
 
   // arm position to floor
   public void ArmPosFloor() {
+    ArmExtend();
     if(Math.abs(armEncoderLeft.getPosition() - posFloor) > 50) {
-      
+      if(armEncoderLeft.getPosition() > 0) {
+        armMotorGroup.set(-0.3);
+      } else if(armEncoderLeft.getPosition() < 0) {
+        armMotorGroup.set(0.3);
+      }
     }
   }
 
   public void ArmPosConveyor() {
-
+    ArmRetract();
+    if(Math.abs(armEncoderLeft.getPosition() - posConveyor) > 50) {
+      if(armEncoderLeft.getPosition() > 0) {
+        armMotorGroup.set(-0.3);
+      } else if(armEncoderLeft.getPosition() < 0) {
+        armMotorGroup.set(0.3);
+      }
+    }
   }
+
+  public void ArmPosHumanPlayer() {
+    ArmRetract();
+    if(Math.abs(armEncoderLeft.getPosition() - posHP) > 50) {
+      if(armEncoderLeft.getPosition() > 0) {
+        armMotorGroup.set(-0.3);
+      } else if(armEncoderLeft.getPosition() < 0) {
+        armMotorGroup.set(0.3);
+      }
+    }
+  }
+
+  public void ArmPosNode1() {
+    ArmExtend();
+    if(Math.abs(armEncoderLeft.getPosition() - posNode1 + nodeVar) > 50) {
+      if(armEncoderLeft.getPosition() > 0) {
+        armMotorGroup.set(-0.3);
+      } else if(armEncoderLeft.getPosition() < 0) {
+        armMotorGroup.set(0.3);
+      }
+    }
+  }
+
+  public void ArmPosNode2() {
+    ArmExtend();
+    if(Math.abs(armEncoderLeft.getPosition() - posNode2 + nodeVar) > 50) {
+      if(armEncoderLeft.getPosition() > 0) {
+        armMotorGroup.set(-0.3);
+      } else if(armEncoderLeft.getPosition() < 0) {
+        armMotorGroup.set(0.3);
+      }
+    }
+  }
+
+  public void ArmPosNode3() {
+    ArmExtend();
+    if(Math.abs(armEncoderLeft.getPosition() - posNode3 + nodeVar) > 50) {
+      if(armEncoderLeft.getPosition() > 0) {
+        armMotorGroup.set(-0.3);
+      } else if(armEncoderLeft.getPosition() < 0) {
+        armMotorGroup.set(0.3);
+      }
+    }
+  }
+
+  public void nodeHold() {
+    nodeVar = 50;
+  }
+
+  public void nodeRelease() {
+    nodeVar = 0;
+  }
+
+  public boolean getItemDIO() {
+    if(itemSensor.get()) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
 }

@@ -30,4 +30,7 @@ public final class Constants {
     public static int ARM_MOTOR_RIGHT = 0;
   }
 
+  public static class DIO {
+    public static int ITEM_SENSOR = 0;
+  }
 }
