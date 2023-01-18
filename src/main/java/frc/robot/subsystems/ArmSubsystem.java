@@ -136,6 +136,7 @@ public class ArmSubsystem extends SubsystemBase {
   // arm position to floor
   public void ArmPosFloor() {
     ArmExtend();
+    GrabberOpen();
     if(Math.abs(armEncoderLeft.getPosition() - posFloor) > 50) {
       if(armEncoderLeft.getPosition() > 0) {
         armMotorGroup.set(-0.3);
@@ -147,6 +148,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void ArmPosConveyor() {
     ArmRetract();
+    GrabberOpen();
     if(Math.abs(armEncoderLeft.getPosition() - posConveyor) > 50) {
       if(armEncoderLeft.getPosition() > 0) {
         armMotorGroup.set(-0.3);
@@ -158,6 +160,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   public void ArmPosHumanPlayer() {
     ArmRetract();
+    GrabberOpen();
+    GrabberLift();
     if(Math.abs(armEncoderLeft.getPosition() - posHP) > 50) {
       if(armEncoderLeft.getPosition() > 0) {
         armMotorGroup.set(-0.3);
@@ -215,5 +219,4 @@ public class ArmSubsystem extends SubsystemBase {
       return false;
     }
   }
-
 }
