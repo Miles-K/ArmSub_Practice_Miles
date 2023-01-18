@@ -21,6 +21,6 @@ public class ArmToggle extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.ArmToggle();
+    // armSubsystem.ArmToggle();
   }
 }

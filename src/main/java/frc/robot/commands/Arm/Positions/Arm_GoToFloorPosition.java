@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Arm;
+package frc.robot.commands.Arm.Positions;
 
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -10,9 +10,9 @@ import frc.robot.subsystems.ArmSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class GrabberShut extends InstantCommand {
+public class Arm_GoToFloorPosition extends InstantCommand {
   private ArmSubsystem armSubsystem;
-  public GrabberShut(ArmSubsystem armSubsystem) {
+  public Arm_GoToFloorPosition(ArmSubsystem armSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
     addRequirements(armSubsystem);
@@ -21,6 +21,7 @@ public class GrabberShut extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.GrabberShut();
+    armSubsystem.Arm_GoToFloorPosition();
+    //Positions in constants. TOP_POSITION = 3000;
   }
 }

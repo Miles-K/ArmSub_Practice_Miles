@@ -2,7 +2,7 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Arm;
+package frc.robot.commands.Arm.Positions;
 
 import com.fasterxml.jackson.databind.ser.std.ArraySerializerBase;
 
@@ -12,9 +12,9 @@ import frc.robot.subsystems.ArmSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ArmPosConveyor extends InstantCommand {
+public class Arm_GoToConveyorPosition extends InstantCommand {
   private ArmSubsystem armSubsystem;
-  public ArmPosConveyor(ArmSubsystem armSubsystem) {
+  public Arm_GoToConveyorPosition(ArmSubsystem armSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
     addRequirements(armSubsystem);
@@ -23,6 +23,7 @@ public class ArmPosConveyor extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.ArmPosConveyor();
+    armSubsystem.Arm_GoToConveyorPosition();
+    //Arm_GoToConveyorPosition();
   }
 }

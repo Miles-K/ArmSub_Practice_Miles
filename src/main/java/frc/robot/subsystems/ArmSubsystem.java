@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
@@ -35,21 +36,18 @@ public class ArmSubsystem extends SubsystemBase {
   private RelativeEncoder armEncoderLeft;
   private RelativeEncoder armEncoderRight;
 
-  // arm motors motor cotroller group
-  private MotorControllerGroup armMotorGroup;
-
   private DigitalInput itemSensor;
 
-  // arm position presets
-  private double posFloor = 0;
-  private double posConveyor = 0;
-  private double posHP = 0;
-  private double posNode1 = 0;
-  private double posNode2 = 0;
-  private double posNode3 = 0;
+  //    arm position presets
+  //
+  // private double posFloor = 0;
+  // private double posConveyor = 0;
+  // private double posHP = 0;
+  // private double posNode1 = 0;
+  // private double posNode2 = 0;
+  // private double posNode3 = 0;
 
-  // adjustment # between cone nodes and cube nodes
-  private double nodeVar;
+  private SparkMaxPIDController PIDControllerArm;
 
   public ArmSubsystem() {
 
@@ -68,7 +66,6 @@ public class ArmSubsystem extends SubsystemBase {
     armEncoderLeft = armMotorLeft.getEncoder();
     armEncoderRight = armMotorRight.getEncoder();
 
-    armMotorGroup = new MotorControllerGroup(armMotorLeft, armMotorRight);
     armMotorRight.follow(armMotorLeft, true);
 
     // sensor
@@ -78,16 +75,14 @@ public class ArmSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // This method will be called once per scheduler run
-  }
 
-  // arm run at low speed
-  public void ArmRun() {
-    armMotorGroup.set(0.1);
+    // Telemetry - SmartDashboard
+
   }
 
   // arm stop
   public void ArmStop() {
-    armMotorGroup.set(0.);
+    armMotorLeft.set(0.);
   }
 
   // arm extension
@@ -103,13 +98,13 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   // arm piston toggle
-  public void ArmToggle() {
-    if(!armPistonLeft.get()) {
-      ArmExtend();
-    } else {
-      ArmRetract();
-    }
-  }
+  // public void ArmToggle() {
+  //   if(!armPistonLeft.get()) {
+  //     ArmExtend();
+  //   } else {
+  //     ArmRetract();
+  //   }
+  // }
 
   // grabber retraction
   public void GrabberClose() {
@@ -133,122 +128,74 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   // grabber latch lift
-  public void GrabberLift() {
+  public void GrabberUp() {
     if(!getItemDIO()) {
       grabberPistonLatch.set(true);
     }
   }
 
   // grabber latch shut
-  public void GrabberShut() {
+  public void GrabberDown() {
     if(getItemDIO()) {
       grabberPistonLatch.set(false);
     }
   }
 
     // grabber claw position toggle
-  public void GrabberLatchToggle() {
-    if(!grabberPistonLatch.get()) {
-      GrabberLift();
-    } else {
-      GrabberShut();
-    }
-  }
+  // public void GrabberLatchToggle() {
+  //   if(!grabberPistonLatch.get()) {
+  //     GrabberUp();
+  //   } else {
+  //     GrabberDown();
+  //   }
+  // }
 
   // arm joystick input
   public void ArmJoystick(double speed) {
-    armMotorGroup.set(speed);
+    armMotorLeft.set(speed);
   }
 
   // arm position to floor
-  public void ArmPosFloor() {
+  public void Arm_GoToFloorPosition() {
     ArmExtend();
     GrabberOpen();
-    if(Math.abs(armEncoderLeft.getPosition() - posFloor) > 50) {
-      if(armEncoderLeft.getPosition() > 0) {
-        armMotorGroup.set(-0.3);
-      } else if(armEncoderLeft.getPosition() < 0) {
-        armMotorGroup.set(0.3);
-      }
-    }
+    // pid to floor position
   }
 
   //arm position to conveyor
-  public void ArmPosConveyor() {
+  public void Arm_GoToConveyorPosition() {
     ArmRetract();
     GrabberOpen();
-    if(Math.abs(armEncoderLeft.getPosition() - posConveyor) > 50) {
-      if(armEncoderLeft.getPosition() > 0) {
-        armMotorGroup.set(-0.3);
-      } else if(armEncoderLeft.getPosition() < 0) {
-        armMotorGroup.set(0.3);
-      }
-    }
+    // pid to conveyor position
   }
 
-  //arm position to HP
-  public void ArmPosHumanPlayer() {
+  //arm position to HP Shelf
+  public void Arm_GoToShelfPosition() {
     ArmRetract();
     GrabberOpen();
-    GrabberLift();
-    if(Math.abs(armEncoderLeft.getPosition() - posHP) > 50) {
-      if(armEncoderLeft.getPosition() > 0) {
-        armMotorGroup.set(-0.3);
-      } else if(armEncoderLeft.getPosition() < 0) {
-        armMotorGroup.set(0.3);
-      }
-    }
+    GrabberUp();
+    // pid to shelf position
   }
 
-  //arm position to Node1
-  public void ArmPosNode1() {
+  //arm position to Low Node
+  public void Arm_GoToLowNode() {
     ArmExtend();
-    if(Math.abs(armEncoderLeft.getPosition() - posNode1 + nodeVar) > 50) {
-      if(armEncoderLeft.getPosition() > 0) {
-        armMotorGroup.set(-0.3);
-      } else if(armEncoderLeft.getPosition() < 0) {
-        armMotorGroup.set(0.3);
-      }
-    }
+    // pid to Low Node position
   }
 
-  //arm position to Node2
-  public void ArmPosNode2() {
+  //arm position to Medium Node
+  public void Arm_GoToMediumNode() {
     ArmExtend();
-    if(Math.abs(armEncoderLeft.getPosition() - posNode2 + nodeVar) > 50) {
-      if(armEncoderLeft.getPosition() > 0) {
-        armMotorGroup.set(-0.3);
-      } else if(armEncoderLeft.getPosition() < 0) {
-        armMotorGroup.set(0.3);
-      }
-    }
+    // pid to Medium Node position
   }
 
-  //arm position to Node3
-  public void ArmPosNode3() {
+  //arm position to High Node
+  public void Arm_GoToHighNode() {
     ArmExtend();
-    if(Math.abs(armEncoderLeft.getPosition() - posNode3 + nodeVar) > 50) {
-      if(armEncoderLeft.getPosition() > 0) {
-        armMotorGroup.set(-0.3);
-      } else if(armEncoderLeft.getPosition() < 0) {
-        armMotorGroup.set(0.3);
-      }
-    }
-  }
-
-  public void nodeHold() {
-    nodeVar = 50;
-  }
-
-  public void nodeRelease() {
-    nodeVar = 0;
+    // pid to High Node position
   }
 
   public boolean getItemDIO() {
-    if(itemSensor.get()) {
-      return true;
-    } else {
-      return false;
-    }
+    return itemSensor.get();
   }
 }
