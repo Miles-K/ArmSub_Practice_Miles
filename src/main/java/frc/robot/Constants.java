@@ -26,11 +26,12 @@ public final class Constants {
     public static int GRABBER_PISTON_LEFT = 0;
     public static int GRABBER_PISTON_RIGHT = 0;
     public static int GRABBER_PISTON_LATCH = 0;    
+    public static int LEFT_GRABBER_PISTON = 0;
 
     // conveyor
 
     // chassis
-    
+
   }
 
   public static class CAN {
@@ -42,7 +43,7 @@ public final class Constants {
     public static int ITEM_SENSOR = 0;
   }
 
-  public static final class ARM {
+  public static class ARM {
 
     public static final int FLOOR_POSITION = 0;
     public static final int CONVEYOR_POSITION = 0;

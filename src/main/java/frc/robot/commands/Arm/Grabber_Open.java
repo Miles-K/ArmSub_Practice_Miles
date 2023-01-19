@@ -10,9 +10,9 @@ import frc.robot.subsystems.ArmSubsystem;
 // NOTE:  Consider using this command inline, rather than writing a subclass.  For more
 // information, see:
 // https://docs.wpilib.org/en/stable/docs/software/commandbased/convenience-features.html
-public class ArmRetract extends InstantCommand {
-  public ArmSubsystem armSubsystem;
-  public ArmRetract(ArmSubsystem armSubsystem) {
+public class Grabber_Open extends InstantCommand {
+  private ArmSubsystem armSubsystem;
+  public Grabber_Open(ArmSubsystem armSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
     addRequirements(armSubsystem);
@@ -21,6 +21,6 @@ public class ArmRetract extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.ArmRetract();
+    armSubsystem.Grabber_Open();
   }
 }

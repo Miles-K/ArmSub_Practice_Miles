@@ -4,18 +4,15 @@
 
 package frc.robot.commands.Arm;
 
-import java.util.ArrayDeque;
 import java.util.function.DoubleSupplier;
-
-import edu.wpi.first.networktables.DoubleSubscriber;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class ArmJoystick extends CommandBase {
+public class Arm_Joystick extends CommandBase {
   /** Creates a new ArmJoystick. */
   private ArmSubsystem armSubsystem;
   private DoubleSupplier armJoystick;
-  public ArmJoystick(ArmSubsystem armSubsystem, DoubleSupplier armJoystick) {
+  public Arm_Joystick(ArmSubsystem armSubsystem, DoubleSupplier armJoystick) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
     this.armJoystick = armJoystick;
@@ -30,14 +27,14 @@ public class ArmJoystick extends CommandBase {
   @Override
   public void execute() {
     if(Math.abs(armJoystick.getAsDouble()) > 0.05) {
-      armSubsystem.ArmJoystick(armJoystick.getAsDouble());
+      armSubsystem.Arm_Joystick(armJoystick.getAsDouble());
     }
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    armSubsystem.ArmStop();
+    armSubsystem.Arm_Stop();
   }
 
   // Returns true when the command should end.

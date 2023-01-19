@@ -36,7 +36,7 @@ public class ArmSubsystem extends SubsystemBase {
   private RelativeEncoder armEncoderLeft;
   private RelativeEncoder armEncoderRight;
 
-  private DigitalInput itemSensor;
+  private DigitalInput holdSensor;
 
   //    arm position presets
   //
@@ -50,6 +50,7 @@ public class ArmSubsystem extends SubsystemBase {
   private SparkMaxPIDController PIDControllerArm;
 
   public ArmSubsystem() {
+
 
     // initialization
     // arm & grabber
@@ -69,7 +70,7 @@ public class ArmSubsystem extends SubsystemBase {
     armMotorRight.follow(armMotorLeft, true);
 
     // sensor
-    itemSensor = new DigitalInput(Constants.DIO.ITEM_SENSOR);
+    holdSensor = new DigitalInput(Constants.DIO.ITEM_SENSOR);
   }
 
   @Override
@@ -81,18 +82,18 @@ public class ArmSubsystem extends SubsystemBase {
   }
 
   // arm stop
-  public void ArmStop() {
+  public void Arm_Stop() {
     armMotorLeft.set(0.);
   }
 
   // arm extension
-  public void ArmExtend() {
+  public void Arm_Extend() {
     armPistonLeft.set(true);
     armPistonRight.set(true);
   }
 
   // arm retraction
-  public void ArmRetract() {
+  public void Arm_Retract() {
     armPistonLeft.set(false);
     armPistonRight.set(false);
   }
@@ -107,36 +108,36 @@ public class ArmSubsystem extends SubsystemBase {
   // }
 
   // grabber retraction
-  public void GrabberClose() {
+  public void Grabber_Close() {
     grabberPistonLeft.set(true);
     grabberPistonRight.set(true);
   }
 
   // grabber extension
-  public void GrabberOpen() {
+  public void Grabber_Open() {
     grabberPistonLeft.set(false);
     grabberPistonRight.set(false);
   }
 
   // grabber claw position toggle
-  public void GrabberToggle() {
-    if(!grabberPistonLeft.get()) {
-      GrabberClose();
-    } else {
-      GrabberOpen();
-    }
-  }
+  // public void Grabber_Toggle() {
+  //   if(!grabberPistonLeft.get()) {
+  //     GrabberClose();
+  //   } else {
+  //     GrabberOpen();
+  //   }
+  // }
 
   // grabber latch lift
-  public void GrabberUp() {
-    if(!getItemDIO()) {
+  public void Grabber_Up() {
+    if(!getHoldSensor()) {
       grabberPistonLatch.set(true);
     }
   }
 
   // grabber latch shut
-  public void GrabberDown() {
-    if(getItemDIO()) {
+  public void Grabber_Down() {
+    if(getHoldSensor()) {
       grabberPistonLatch.set(false);
     }
   }
@@ -151,51 +152,51 @@ public class ArmSubsystem extends SubsystemBase {
   // }
 
   // arm joystick input
-  public void ArmJoystick(double speed) {
+  public void Arm_Joystick(double speed) {
     armMotorLeft.set(speed);
   }
 
   // arm position to floor
   public void Arm_GoToFloorPosition() {
-    ArmExtend();
-    GrabberOpen();
+    Arm_Extend();
+    Grabber_Open();
     // pid to floor position
   }
 
   //arm position to conveyor
   public void Arm_GoToConveyorPosition() {
-    ArmRetract();
-    GrabberOpen();
+    Arm_Retract();
+    Grabber_Open();
     // pid to conveyor position
   }
 
   //arm position to HP Shelf
   public void Arm_GoToShelfPosition() {
-    ArmRetract();
-    GrabberOpen();
-    GrabberUp();
+    Arm_Retract();
+    Grabber_Open();
+    Grabber_Up();
     // pid to shelf position
   }
 
   //arm position to Low Node
   public void Arm_GoToLowNode() {
-    ArmExtend();
+    Arm_Extend();
     // pid to Low Node position
   }
 
   //arm position to Medium Node
   public void Arm_GoToMediumNode() {
-    ArmExtend();
+    Arm_Extend();
     // pid to Medium Node position
   }
 
   //arm position to High Node
   public void Arm_GoToHighNode() {
-    ArmExtend();
+    Arm_Extend();
     // pid to High Node position
   }
 
-  public boolean getItemDIO() {
-    return itemSensor.get();
+  public boolean getHoldSensor() {
+    return holdSensor.get();
   }
 }
