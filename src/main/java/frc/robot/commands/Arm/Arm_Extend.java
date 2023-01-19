@@ -21,6 +21,6 @@ public class Arm_Extend extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.Arm_Extend();
+    armSubsystem.Arm_ExtendBase();
   }
 }

@@ -4,36 +4,34 @@
 
 package frc.robot.commands.Arm;
 
-import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.ImpiLib2023;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class Arm_Joystick extends CommandBase {
-  /** Creates a new ArmJoystick. */
+public class Arm_NodeSwitch extends CommandBase {
+  /** Creates a new Arm_NodeSwitch. */
   private ArmSubsystem armSubsystem;
-  private DoubleSupplier armJoystick;
-  public Arm_Joystick(ArmSubsystem armSubsystem, DoubleSupplier armJoystick) {
+  public Arm_NodeSwitch(ArmSubsystem armSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
-    this.armJoystick = armJoystick;
     addRequirements(armSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    armSubsystem.Arm_NodeNoSwitch();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSubsystem.Arm_Joystick(ImpiLib2023.deadzone(armJoystick.getAsDouble(), 0.05));
+    armSubsystem.Arm_NodeSwitch();
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    armSubsystem.Arm_Stop();
+    armSubsystem.Arm_NodeNoSwitch();
   }
 
   // Returns true when the command should end.

@@ -2,32 +2,37 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package frc.robot.commands.Arm;
+package frc.robot.commands.Arm.Positions;
 
-import java.util.function.DoubleSupplier;
 import edu.wpi.first.wpilibj2.command.CommandBase;
-import frc.robot.ImpiLib2023;
+import frc.robot.Constants;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class Arm_Joystick extends CommandBase {
-  /** Creates a new ArmJoystick. */
+public class Arm_RunToHighNode extends CommandBase {
+  /** Creates a new Arm_RunToHighNode. */
   private ArmSubsystem armSubsystem;
-  private DoubleSupplier armJoystick;
-  public Arm_Joystick(ArmSubsystem armSubsystem, DoubleSupplier armJoystick) {
+  private boolean nodeSwitch;
+  public Arm_RunToHighNode(ArmSubsystem armSubsystem) {
     // Use addRequirements() here to declare subsystem dependencies.
     this.armSubsystem = armSubsystem;
-    this.armJoystick = armJoystick;
     addRequirements(armSubsystem);
   }
 
   // Called when the command is initially scheduled.
   @Override
-  public void initialize() {}
+  public void initialize() {
+    armSubsystem.Arm_ExtendBase();
+    nodeSwitch = armSubsystem.getNodeSwitch();
+  }
 
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    armSubsystem.Arm_Joystick(ImpiLib2023.deadzone(armJoystick.getAsDouble(), 0.05));
+    if(nodeSwitch) {
+      armSubsystem.Arm_RunToPosition(Constants.ARM.HIGH_CUBE_POSITION);
+    } else {
+      armSubsystem.Arm_RunToPosition(Constants.ARM.HIGH_CONE_POSITION);
+    }
   }
 
   // Called once the command ends or is interrupted.

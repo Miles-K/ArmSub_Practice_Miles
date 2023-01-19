@@ -21,6 +21,6 @@ public class Arm_Retract extends InstantCommand {
   // Called when the command is initially scheduled.
   @Override
   public void initialize() {
-    armSubsystem.Arm_Retract();
+    armSubsystem.Arm_RetractBase();
   }
 }

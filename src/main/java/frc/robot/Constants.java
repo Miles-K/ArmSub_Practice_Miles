@@ -40,7 +40,8 @@ public final class Constants {
   }
 
   public static class DIO {
-    public static int ITEM_SENSOR = 0;
+    public static int HOLD_SENSOR = 0;
+    public static int LIMIT_SWITCH = 0;
   }
 
   public static class ARM {
@@ -55,9 +56,12 @@ public final class Constants {
     public static final int HIGH_CUBE_POSITION = 0;
     public static final int HIGH_CONE_POSITION = 0;
 
+    // public static final int NODE_ADJUST = 50;
+
     public static final int KP = 0;
     public static final int KI = 0;
     public static final int KD = 0;
+    public static final int KFF = 0;
     
 
 

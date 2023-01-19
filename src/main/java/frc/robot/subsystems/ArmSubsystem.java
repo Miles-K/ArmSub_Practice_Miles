@@ -7,12 +7,13 @@ package frc.robot.subsystems;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.CANSparkMax.ControlType;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.Solenoid;
-import edu.wpi.first.wpilibj.motorcontrol.MotorControllerGroup;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
 
@@ -20,26 +21,30 @@ public class ArmSubsystem extends SubsystemBase {
   /** Creates a new ArmSubsystem. */
 
   // arm extension pistons
-  private Solenoid armPistonLeft;
-  private Solenoid armPistonRight;
+  private Solenoid armPistonLeft = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.ARM_PISTON_LEFT);
+  private Solenoid armPistonRight = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.ARM_PISTON_RIGHT);
 
   // grabber pistons
-  private Solenoid grabberPistonLeft;
-  private Solenoid grabberPistonRight;
-  private Solenoid grabberPistonLatch;
+  private Solenoid grabberPistonLeft = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.GRABBER_PISTON_LEFT);
+  private Solenoid grabberPistonRight = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.GRABBER_PISTON_RIGHT);
+  private Solenoid grabberPistonLatch = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.GRABBER_PISTON_LATCH);
 
   // arm maneuvering motors
-  private CANSparkMax armMotorLeft;
-  private CANSparkMax armMotorRight;
+  private CANSparkMax leftArmMotor = new CANSparkMax(Constants.CAN.ARM_MOTOR_LEFT, MotorType.kBrushless);
+  private CANSparkMax rightArmMotor = new CANSparkMax(Constants.CAN.ARM_MOTOR_RIGHT, MotorType.kBrushless);
 
   // arm encoders
-  private RelativeEncoder armEncoderLeft;
-  private RelativeEncoder armEncoderRight;
+  private RelativeEncoder armEncoderLeft = leftArmMotor.getEncoder();
+  private RelativeEncoder armEncoderRight = rightArmMotor.getEncoder();
 
-  private DigitalInput holdSensor;
+  // sensors
+  private DigitalInput holdSensor = new DigitalInput(Constants.DIO.HOLD_SENSOR);
+  private DigitalInput armLimitSwitch = new DigitalInput(Constants.DIO.LIMIT_SWITCH);
 
   //    arm position presets
   //
+  private double armSetpoint = 0;
+  // private double nodeAdjust = 50;
   // private double posFloor = 0;
   // private double posConveyor = 0;
   // private double posHP = 0;
@@ -47,30 +52,20 @@ public class ArmSubsystem extends SubsystemBase {
   // private double posNode2 = 0;
   // private double posNode3 = 0;
 
-  private SparkMaxPIDController PIDControllerArm;
+  private boolean nodeSwitch = false;
+
+  private SparkMaxPIDController pidControllerArm = leftArmMotor.getPIDController();
 
   public ArmSubsystem() {
 
+    leftArmMotor.setIdleMode(IdleMode.kBrake);
+    rightArmMotor.setIdleMode(IdleMode.kBrake);
+    rightArmMotor.follow(leftArmMotor, true);
 
-    // initialization
-    // arm & grabber
-    armPistonLeft = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.ARM_PISTON_LEFT);
-    armPistonRight = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.ARM_PISTON_RIGHT);
-
-    grabberPistonLeft = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.GRABBER_PISTON_LEFT);
-    grabberPistonRight = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.GRABBER_PISTON_RIGHT);
-    grabberPistonLatch = new Solenoid(PneumaticsModuleType.REVPH, Constants.PCM.GRABBER_PISTON_LATCH);
-
-    armMotorLeft = new CANSparkMax(Constants.CAN.ARM_MOTOR_LEFT, MotorType.kBrushless);
-    armMotorRight = new CANSparkMax(Constants.CAN.ARM_MOTOR_RIGHT, MotorType.kBrushless);
-
-    armEncoderLeft = armMotorLeft.getEncoder();
-    armEncoderRight = armMotorRight.getEncoder();
-
-    armMotorRight.follow(armMotorLeft, true);
-
-    // sensor
-    holdSensor = new DigitalInput(Constants.DIO.ITEM_SENSOR);
+    pidControllerArm.setP(Constants.ARM.KP);
+    pidControllerArm.setI(Constants.ARM.KI);
+    pidControllerArm.setD(Constants.ARM.KD);
+    pidControllerArm.setFF(Constants.ARM.KFF);
   }
 
   @Override
@@ -78,22 +73,30 @@ public class ArmSubsystem extends SubsystemBase {
     // This method will be called once per scheduler run
 
     // Telemetry - SmartDashboard
-
+    // P
+    // I
+    // D
+    // FF
+    // arm pos state
+    // arm pos encoder
+    // grabber closed/open
+    // grabber up/down
+    // arm retracted/extended
   }
 
   // arm stop
   public void Arm_Stop() {
-    armMotorLeft.set(0.);
+    leftArmMotor.set(0.);
   }
 
   // arm extension
-  public void Arm_Extend() {
+  public void Arm_ExtendBase() {
     armPistonLeft.set(true);
     armPistonRight.set(true);
   }
 
   // arm retraction
-  public void Arm_Retract() {
+  public void Arm_RetractBase() {
     armPistonLeft.set(false);
     armPistonRight.set(false);
   }
@@ -153,47 +156,26 @@ public class ArmSubsystem extends SubsystemBase {
 
   // arm joystick input
   public void Arm_Joystick(double speed) {
-    armMotorLeft.set(speed);
+    leftArmMotor.set(speed);
   }
 
-  // arm position to floor
-  public void Arm_GoToFloorPosition() {
-    Arm_Extend();
-    Grabber_Open();
-    // pid to floor position
+  // arm to position
+  public void Arm_RunToPosition(double armSetpoint) {
+    this.armSetpoint = armSetpoint;
+    pidControllerArm.setReference(armSetpoint, ControlType.kPosition);
+    // pid to position
   }
 
-  //arm position to conveyor
-  public void Arm_GoToConveyorPosition() {
-    Arm_Retract();
-    Grabber_Open();
-    // pid to conveyor position
+  public void Arm_NodeSwitch() {
+    nodeSwitch = true;
   }
 
-  //arm position to HP Shelf
-  public void Arm_GoToShelfPosition() {
-    Arm_Retract();
-    Grabber_Open();
-    Grabber_Up();
-    // pid to shelf position
+  public void Arm_NodeNoSwitch() {
+    nodeSwitch = false;
   }
 
-  //arm position to Low Node
-  public void Arm_GoToLowNode() {
-    Arm_Extend();
-    // pid to Low Node position
-  }
-
-  //arm position to Medium Node
-  public void Arm_GoToMediumNode() {
-    Arm_Extend();
-    // pid to Medium Node position
-  }
-
-  //arm position to High Node
-  public void Arm_GoToHighNode() {
-    Arm_Extend();
-    // pid to High Node position
+  public boolean getNodeSwitch() {
+    return nodeSwitch;
   }
 
   public boolean getHoldSensor() {
